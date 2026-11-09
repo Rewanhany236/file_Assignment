@@ -1,4 +1,5 @@
 #include "Doctor.h"
+#include "PrimaryIndex.h"
 #include <iostream>
 #include <cstring>
 #include <fstream>
@@ -14,25 +15,12 @@ void Doctor::formatField(char field[], string val, int size)
     memcpy(field, val.c_str(), len);
 }
 
-bool Doctor::isDoctorExists(fstream &file, string doctorID)
+bool Doctor::isDoctorExists(fstream &file, string doctorID, PrimaryIndex &pIndex)
 {
-    char formatId[15];
-    formatField(formatId, doctorID, 15);
-
-    file.seekg(FILE_HEADER_SIZE, ios::beg);
-    Doctor doctor;
-    while (file.read((char *) &doctor, sizeof(Doctor)))
-    {
-        if (doctor.id[0]!=DELETE_FLAG)
-        {
-           if ( memcmp(formatId, doctor.id, 15)==0)
-               return true;
-        }
-    }
-    return false;
+    return pIndex.exists(doctorID);
 }
 
-void Doctor::addDoctor(fstream& file)
+void Doctor::addDoctor(fstream& file,PrimaryIndex &pIndex)
 {
     Doctor d;
     string id, name, spec, addr;
@@ -41,7 +29,7 @@ void Doctor::addDoctor(fstream& file)
     cout << "Enter Doctor ID: ";
     cin >> id;
 
-    if (isDoctorExists(file, id)) {
+    if (isDoctorExists(file, id,pIndex)) {
         cout << "Error: Duplicate Doctor ID! This ID already exists.\n";
         return;
     }
@@ -84,13 +72,14 @@ void Doctor::addDoctor(fstream& file)
     }
 
     file.write((char*)&d, sizeof(Doctor));
+    pIndex.insertEntry(d.id, wrightOffset);
 
     cout << "Doctor added successfully at offset " << wrightOffset << endl;
 
 }
 
 
-void Doctor::deleteDoctor(fstream& file)
+void Doctor::deleteDoctor(fstream& file,PrimaryIndex &pIndex)
 {
     string id;
     cout << "Enter Doctor ID to delete: ";
@@ -101,14 +90,7 @@ void Doctor::deleteDoctor(fstream& file)
 
     file.seekg(FILE_HEADER_SIZE, ios::beg);
     Doctor d;
-    int targetOffset = -1;
-
-    while (file.read((char*)&d, sizeof(Doctor))) {
-        if (d.id[0] != DELETE_FLAG && memcmp(d.id, searchId, 15) == 0) {
-            targetOffset = (int)file.tellg() - sizeof(Doctor);
-            break;
-        }
-    }
+    int targetOffset = pIndex.getOffset(d.id);
     if (targetOffset == -1) {
         cout << "Error: Doctor not found.\n";
         return;
@@ -125,17 +107,19 @@ void Doctor::deleteDoctor(fstream& file)
     file.seekp(0, ios::beg);
     file.write((char*)&targetOffset, sizeof(int));
 
+    pIndex.deleteEntry(d.id);
+
     cout << "Doctor deleted successfully at offset " << targetOffset << endl;
 }
 
 
-void Doctor::updateDoctorName(fstream& file)
+void Doctor::updateDoctorName(fstream& file,PrimaryIndex &pIndex)
 {
     string id, name;
     cout << "Enter Doctor ID to update: ";
     cin >> id;
 
-    int offset = -10; // = pIndex.search
+    int offset = pIndex.getOffset(id); // = pIndex.search
     if (offset==-1)
     {
         cout << "Error: Doctor not found.\n";
@@ -146,6 +130,7 @@ void Doctor::updateDoctorName(fstream& file)
     file.read((char*)&d, sizeof(Doctor));
 
     cout << "Enter new Doctor Name: ";
+    cin.ignore();
     getline(cin, name);
     formatField(d.name, name, 30);
     file.seekp(offset, ios::beg);
@@ -153,6 +138,62 @@ void Doctor::updateDoctorName(fstream& file)
 
     cout << "Doctor Name updated successfully at offset " << offset << endl;
 }
+
+void Doctor::printDoctorInfo(fstream& file,PrimaryIndex &pIndex)
+{
+    string id;
+    cout << "Enter Doctor ID to print: ";
+    cin >> id;
+
+    Doctor d;
+    int offset = pIndex.getOffset(id);
+    if (offset==-1)
+    {
+        cout << "Error: Doctor not found.\n";
+        return;
+    }
+    file.seekg(offset, ios::beg);
+    file.read((char*)&d, sizeof(Doctor));
+    cout << "Doctor ID: " << d.id << endl;
+    cout << "Doctor Name: " << d.name << endl;
+    cout << "Specialty: " << d.specialty << endl;
+    cout << "Address: " << d.address << endl;
+}
+void Doctor::updateDoctorId(fstream& file,PrimaryIndex &pIndex)
+{
+    string id, newId;
+    cout << "Enter Doctor ID to update: ";
+    cin >> id;
+
+    int offset = pIndex.getOffset(id);
+    if (offset==-1)
+    {
+        cout << "Error: Doctor not found.\n";
+        return;
+    }
+
+    cout << "Enter new Doctor ID: ";
+    cin >> newId;
+    if (isDoctorExists(file, newId,pIndex))
+    {
+        cout << "Error: Duplicate Doctor ID! This ID already exists.\n";
+        return;
+    }
+    file.seekg(offset, ios::beg);
+    Doctor d;
+    file.read((char*)&d, sizeof(Doctor));
+    formatField(d.id, newId, 15);
+    file.seekp(offset, ios::beg);
+    file.write((char*)&d, sizeof(Doctor));
+    pIndex.updateKey(id, newId);
+    cout << "Doctor ID updated successfully at offset " << offset << endl;
+}
+
+void Doctor::seedInitialDoctors(fstream& file) // 5 doctors
+{
+
+}
+
 
 
 

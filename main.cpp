@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include "Doctor.h"          // [Member 3]
+#include "Doctor.h"
+#include "PrimaryIndex.h"
 using namespace std;
 
 PrimaryIndex doctorIdx;      // [Member 3] Index #1 (Doctor ID)
@@ -28,10 +29,10 @@ int main()
         cout << "\n1 Add  2 Delete  3 Update Name  4 Update ID  5 Show index  0 Exit\n> ";
         cin >> choice;
         if (choice == 0) break;
-        if (choice == 1) d.addDoctor(file);
-        else if (choice == 2) d.deleteDoctor(file);
-        else if (choice == 3) d.updateDoctorName(file);
-        else if (choice == 4) d.updateDoctorID(file);
+        if (choice == 1) d.addDoctor(file,doctorIdx);
+        else if (choice == 2) d.deleteDoctor(file,doctorIdx);
+        else if (choice == 3) d.updateDoctorId(file,doctorIdx);
+        else if (choice == 4) d.updateDoctorName(file,doctorIdx);
         else if (choice == 5) doctorIdx.print();
     }
     file.close();

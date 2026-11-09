@@ -5,11 +5,10 @@
 #include <fstream>
 #include <string>
 #include <cstring>
-
+#include "PrimaryIndex.h"
 using namespace std;
 
 const char DELETE_FLAG = '*';
-const char ACTIVE_FLAG = ' ';
 const int FILE_HEADER_SIZE = sizeof(int);
 
 class Doctor
@@ -20,11 +19,12 @@ class Doctor
     char address[30];
 public:
     void formatField(char field[], string val, int size);
-    bool isDoctorExists(fstream &file, string doctorID);
-    void addDoctor(fstream &file);
-    void deleteDoctor(fstream &file);
-    void updateDoctorName(fstream &file);
-    void printDoctorInfo(fstream &file);
+    bool isDoctorExists(fstream &file, string doctorID ,PrimaryIndex &pIndex);
+    void addDoctor(fstream &file, PrimaryIndex &pIndex);
+    void deleteDoctor(fstream &file , PrimaryIndex &pIndex);
+    void updateDoctorName(fstream &file ,PrimaryIndex &pIndex);
+    void updateDoctorId(fstream &file ,PrimaryIndex &pIndex);
+    void printDoctorInfo(fstream &file,PrimaryIndex &pIndex);
     void seedInitialDoctors(fstream &file);
 
 };

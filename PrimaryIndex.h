@@ -12,7 +12,7 @@ using namespace std;
 
 struct PrimaryEntry {
     string key;   
-    int         offset;
+    int offset;
 };
 
 
@@ -27,7 +27,7 @@ private:
             int mid = (low + high) / 2;
             if (data[mid].key == key) return mid;
             if (data[mid].key < key)  low = mid + 1;
-            else                      high = mid - 1;
+            else  high = mid - 1;
         }
         return -1;
     }
