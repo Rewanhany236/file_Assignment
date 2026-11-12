@@ -5,6 +5,7 @@
 #include "PrimaryIndex.h"
 #include "SecondaryIndex.h"
 #include "Appointment.h"
+#include "QueryEngine.h"
 
 using namespace std;
 
@@ -37,12 +38,26 @@ int main()
 
     SecondaryIndex AppointmentDoctorIndex("AppointmentDoctorLL.dat");
     SecondaryIndex DoctorNameIndex("DoctorNameLL.dat");
+    SecondaryIndex DoctorSpecialtyIndex("DoctorSpecialtyLL.dat");
+
 
     doctorIdx.rebuild("Doctors.bin", 95, 15);
     appointmentIdx.rebuild("Appointments.dat", 60, 15);
 
     AppointmentDoctorIndex.rebuild("Appointments.dat", 60, 45, 15, 0, 15);
     DoctorNameIndex.rebuild("Doctors.bin", 95, 15, 30, 0, 15);
+
+    DoctorSpecialtyIndex.rebuild("Doctors.bin", 95, 45, 20, 0, 15);
+
+    QueryEngine queryEngine(
+    file,
+    appointmentFile,
+    doctorIdx,
+    appointmentIdx,
+    DoctorNameIndex,
+    DoctorSpecialtyIndex,
+    AppointmentDoctorIndex
+);
 
     Doctor d;
     Appointments Ap;
@@ -123,7 +138,10 @@ int main()
             break;
 
         case 15:
-            // Write Query
+                string query;
+                cout << "Enter Query: ";
+                getline(cin, query);
+                queryEngine.executeQuery(query);
             break;
 
         case 16:
