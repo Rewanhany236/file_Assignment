@@ -40,28 +40,27 @@ int main()
     SecondaryIndex DoctorNameIndex("DoctorNameLL.dat");
     SecondaryIndex DoctorSpecialtyIndex("DoctorSpecialtyLL.dat");
 
-
     doctorIdx.rebuild("Doctors.bin", 95, 15);
     appointmentIdx.rebuild("Appointments.dat", 60, 15);
 
     AppointmentDoctorIndex.rebuild("Appointments.dat", 60, 45, 15, 0, 15);
     DoctorNameIndex.rebuild("Doctors.bin", 95, 15, 30, 0, 15);
-
     DoctorSpecialtyIndex.rebuild("Doctors.bin", 95, 45, 20, 0, 15);
 
-    QueryEngine queryEngine(
-    file,
-    appointmentFile,
-    doctorIdx,
-    appointmentIdx,
-    DoctorNameIndex,
-    DoctorSpecialtyIndex,
-    AppointmentDoctorIndex
-);
-
     Doctor d;
-    Appointments Ap;
+    d.seedInitialDoctors(file, doctorIdx, DoctorNameIndex, DoctorSpecialtyIndex);
 
+    QueryEngine queryEngine(
+        file,
+        appointmentFile,
+        doctorIdx,
+        appointmentIdx,
+        DoctorNameIndex,
+        DoctorSpecialtyIndex,
+        AppointmentDoctorIndex
+    );
+
+    Appointments Ap;
     int choice;
 
     while (true) {
@@ -87,7 +86,7 @@ int main()
         switch (choice) {
 
         case 6:
-            d.addDoctor(file, doctorIdx, DoctorNameIndex);
+            d.addDoctor(file, doctorIdx, DoctorNameIndex, DoctorSpecialtyIndex);
             break;
 
         case 7:
@@ -104,7 +103,7 @@ int main()
             break;
 
         case 9:
-            d.updateDoctorId(file, doctorIdx, DoctorNameIndex);
+            d.updateDoctorId(file, doctorIdx, DoctorNameIndex, DoctorSpecialtyIndex);
             break;
 
         case 10:
@@ -123,7 +122,7 @@ int main()
             break;
 
         case 12:
-            d.deleteDoctor(file, doctorIdx, DoctorNameIndex);
+            d.deleteDoctor(file, doctorIdx, DoctorNameIndex, DoctorSpecialtyIndex);
             break;
 
         case 13:
@@ -137,12 +136,13 @@ int main()
             );
             break;
 
-        case 15:
-                string query;
-                cout << "Enter Query: ";
-                getline(cin, query);
-                queryEngine.executeQuery(query);
+        case 15: {
+            string query;
+            cout << "Enter Query: ";
+            getline(cin, query);
+            queryEngine.executeQuery(query);
             break;
+        }
 
         case 16:
             cout << "Exiting program...\n";

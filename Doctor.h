@@ -21,12 +21,12 @@ class Doctor
 public:
     void formatField(char field[], string val, int size);
     bool isDoctorExists(fstream &file, string doctorID ,PrimaryIndex &pIndex);
-    void addDoctor(fstream &file, PrimaryIndex &pIndex, SecondaryIndex &sIndex);
-    void deleteDoctor(fstream &file, PrimaryIndex &pIndex, SecondaryIndex &sIndex);
+    void addDoctor(fstream &file, PrimaryIndex &pIndex, SecondaryIndex &sIndex,SecondaryIndex &specIndex);
+    void deleteDoctor(fstream &file, PrimaryIndex &pIndex, SecondaryIndex &sIndex, SecondaryIndex &specIndex);
     void updateDoctorName(fstream &file, PrimaryIndex &pIndex, SecondaryIndex &sIndex);
-    void updateDoctorId(fstream &file, PrimaryIndex &pIndex, SecondaryIndex &sIndex);
+    void updateDoctorId(fstream &file, PrimaryIndex &pIndex, SecondaryIndex &sIndex, SecondaryIndex &specIndex);
     void printDoctorInfo(fstream &file,PrimaryIndex &pIndex);
-    void seedInitialDoctors(fstream &file);
+    void seedInitialDoctors(fstream& file, PrimaryIndex &pIndex, SecondaryIndex &nameIndex, SecondaryIndex &specIndex);
 
 };
 
