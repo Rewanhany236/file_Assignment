@@ -4,11 +4,16 @@
 #include "Doctor.h"
 #include "PrimaryIndex.h"
 #include "Appointment.h"
+#include <SecondaryIndex.h>
+
 
 using namespace std;
 
-PrimaryIndex doctorIdx; 
+PrimaryIndex doctorIdx;
 PrimaryIndex appointmentIdx;
+SecondaryIndex docNameIdx("docName_LL.bin");       // Index #4
+SecondaryIndex docSpecIdx("docSpec_LL.bin");       // Index #5
+SecondaryIndex appDocIdIdx("appDocId_LL.bin");     // Index #3
 
 int main()
 {
@@ -39,6 +44,9 @@ int main()
     // Build indexes when the program starts
     doctorIdx.rebuild("Doctors.bin", 95, 15);
     appointmentIdx.rebuild("Appointments.dat", 60, 15);
+    docNameIdx.rebuild("Doctors.bin", 95, 15, 30, 0, 15);
+    docSpecIdx.rebuild("Doctors.bin", 95, 45, 20, 0, 15);
+    appDocIdIdx.rebuild("Appointments.dat", 60, 45, 15, 0, 15);
 
     Doctor d;
     Appointments Ap;
