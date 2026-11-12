@@ -1,13 +1,18 @@
 #include <iostream>
 #include <fstream>
+#include <limits>
 #include "Doctor.h"
 #include "PrimaryIndex.h"
+#include "Appointment.h"
+
 using namespace std;
 
-PrimaryIndex doctorIdx;      // [Member 3] Index #1 (Doctor ID)
+PrimaryIndex doctorIdx; 
+PrimaryIndex appointmentIdx;
 
 int main()
 {
+    // Open Doctors file
     fstream file("Doctors.bin", ios::in | ios::out | ios::binary);
 
     if (!file) {
@@ -19,22 +24,100 @@ int main()
         file.open("Doctors.bin", ios::in | ios::out | ios::binary);
     }
 
-    // [Member 3] build the index from the file every time the program starts
-    doctorIdx.rebuild("Doctors.bin", 95, 15);
+    // Open Appointments file
+    fstream appointmentFile("Appointments.dat", ios::in | ios::out | ios::binary);
 
-    // ---- TEMPORARY test menu (to be replaced by the real main menu) ----
-    int choice;
-    Doctor d;
-    while (true) {
-        cout << "\n1 Add  2 Delete  3 Update Name  4 Update ID  5 Show index  0 Exit\n> ";
-        cin >> choice;
-        if (choice == 0) break;
-        if (choice == 1) d.addDoctor(file,doctorIdx);
-        else if (choice == 2) d.deleteDoctor(file,doctorIdx);
-        else if (choice == 3) d.updateDoctorId(file,doctorIdx);
-        else if (choice == 4) d.updateDoctorName(file,doctorIdx);
-        else if (choice == 5) doctorIdx.print();
+    if (!appointmentFile) {
+        ofstream createFile("Appointments.dat", ios::binary);
+        int initialHeader = -1;
+        createFile.write((char*)&initialHeader, sizeof(int));
+        createFile.close();
+
+        appointmentFile.open("Appointments.dat", ios::in | ios::out | ios::binary);
     }
-    file.close();
+
+    // Build indexes when the program starts
+    doctorIdx.rebuild("Doctors.bin", 95, 15);
+    appointmentIdx.rebuild("Appointments.dat", 60, 15);
+
+    Doctor d;
+    Appointments Ap;
+
+    int choice;
+
+    while (true) {
+
+        cout << "\n========== Main Menu ==========\n";
+        cout << "6. Add New Doctor\n";
+        cout << "7. Add New Appointment\n";
+        cout << "8. Update Doctor Name (Doctor ID)\n";
+        cout << "9. Update Doctor ID (Key Update Test)\n";
+        cout << "10. Update Appointment Date (Appointment ID)\n";
+        cout << "11. Delete Appointment (Appointment ID)\n";
+        cout << "12. Delete Doctor (Doctor ID)\n";
+        cout << "13. Print Doctor Info (Doctor ID)\n";
+        cout << "14. Print Appointment Info (Appointment ID)\n";
+        cout << "15. Write Query\n";
+        cout << "16. Exit\n";
+
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        // Remove the remaining newline before using getline
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        switch (choice) {
+
+        case 6:
+            d.addDoctor(file, doctorIdx);
+            break;
+
+        case 7:
+            Ap.addAppointment(file, doctorIdx, appointmentIdx);
+            break;
+
+        case 8:
+            d.updateDoctorName(file, doctorIdx);
+            break;
+
+        case 9:
+            d.updateDoctorId(file, doctorIdx);
+            break;
+
+        case 10:
+            Ap.updateAppointment_date(appointmentFile, appointmentIdx);
+            break;
+
+        case 11:
+            Ap.delete_Appointment(appointmentFile, appointmentIdx);
+            break;
+
+        case 12:
+            d.deleteDoctor(file, doctorIdx);
+            break;
+
+        case 13:
+            // Add your Doctor print function here
+            break;
+
+        case 14:
+            Ap.print_Appointment_info(appointmentFile, appointmentIdx);
+            break;
+
+        case 15:
+            // Write Query
+            break;
+
+        case 16:
+            cout << "Exiting program...\n";
+            file.close();
+            appointmentFile.close();
+            return 0;
+
+        default:
+            cout << "Invalid choice. Try again.\n";
+        }
+    }
+
     return 0;
 }
