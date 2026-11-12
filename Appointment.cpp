@@ -1,8 +1,8 @@
-
 #include "Appointment.h"
 #include <iostream>
 #include <fstream>
 #include <string>
+
 using namespace std;
 
 Appointments Ap;
@@ -10,7 +10,8 @@ Appointments Ap;
 void Appointments::addAppointment(
     fstream& file,
     PrimaryIndex& doctorIndex,
-    PrimaryIndex& appointmentIndex
+    PrimaryIndex& appointmentIndex,
+    SecondaryIndex& AppointmentDoctorIndex
 ) {
     Appointments Ap{};
 
@@ -100,13 +101,17 @@ void Appointments::addAppointment(
         return;
     }
 
+    // Add the new appointment to the Secondary Index
+    AppointmentDoctorIndex.insertEntry(doctorID, appointmentID);
+
     cout << "Appointment added successfully" << endl;
 }
 
 
 bool Appointments::delete_Appointment(
     fstream& file,
-    PrimaryIndex& appointmentIndex
+    PrimaryIndex& appointmentIndex,
+    SecondaryIndex& AppointmentDoctorIndex
 ) {
     int list_header = -1;
     char c;
@@ -149,6 +154,20 @@ bool Appointments::delete_Appointment(
         return false;
     }
 
+    // Read appointment before deleting it
+    Appointments AP{};
+
+    file.clear();
+    file.seekg(appointment_offset, ios::beg);
+    file.read((char*)&AP, sizeof(Appointments));
+
+    if (!file) {
+        cout << "Error reading appointment" << endl;
+        return false;
+    }
+
+    string doctorID = AP.Doctor_ID;
+
     // Mark the record as deleted
     file.clear();
     file.seekp(appointment_offset, ios::beg);
@@ -176,6 +195,9 @@ bool Appointments::delete_Appointment(
 
     // Remove the deleted appointment from the Primary Index
     appointmentIndex.deleteEntry(appointmentID);
+
+    // Remove the deleted appointment from the Secondary Index
+    AppointmentDoctorIndex.deleteEntry(doctorID, appointmentID);
 
     cout << "Appointment deleted successfully" << endl;
 
