@@ -6,6 +6,7 @@
 #include <string>
 #include <cstring>
 #include "PrimaryIndex.h"
+#include "SecondaryIndex.h"
 using namespace std;
 
 const char DELETE_FLAG = '*';
@@ -20,10 +21,10 @@ class Doctor
 public:
     void formatField(char field[], string val, int size);
     bool isDoctorExists(fstream &file, string doctorID ,PrimaryIndex &pIndex);
-    void addDoctor(fstream &file, PrimaryIndex &pIndex);
-    void deleteDoctor(fstream &file , PrimaryIndex &pIndex);
-    void updateDoctorName(fstream &file ,PrimaryIndex &pIndex);
-    void updateDoctorId(fstream &file ,PrimaryIndex &pIndex);
+    void addDoctor(fstream &file, PrimaryIndex &pIndex, SecondaryIndex &sIndex);
+    void deleteDoctor(fstream &file, PrimaryIndex &pIndex, SecondaryIndex &sIndex);
+    void updateDoctorName(fstream &file, PrimaryIndex &pIndex, SecondaryIndex &sIndex);
+    void updateDoctorId(fstream &file, PrimaryIndex &pIndex, SecondaryIndex &sIndex);
     void printDoctorInfo(fstream &file,PrimaryIndex &pIndex);
     void seedInitialDoctors(fstream &file);
 

@@ -3,6 +3,7 @@
 #include <limits>
 #include "Doctor.h"
 #include "PrimaryIndex.h"
+#include "SecondaryIndex.h"
 #include "Appointment.h"
 
 using namespace std;
@@ -12,7 +13,6 @@ PrimaryIndex appointmentIdx;
 
 int main()
 {
-    // Open Doctors file
     fstream file("Doctors.bin", ios::in | ios::out | ios::binary);
 
     if (!file) {
@@ -24,7 +24,6 @@ int main()
         file.open("Doctors.bin", ios::in | ios::out | ios::binary);
     }
 
-    // Open Appointments file
     fstream appointmentFile("Appointments.dat", ios::in | ios::out | ios::binary);
 
     if (!appointmentFile) {
@@ -36,24 +35,14 @@ int main()
         appointmentFile.open("Appointments.dat", ios::in | ios::out | ios::binary);
     }
 
-    // Create Secondary Index
     SecondaryIndex AppointmentDoctorIndex("AppointmentDoctorLL.dat");
+    SecondaryIndex DoctorNameIndex("DoctorNameLL.dat");
 
-    // Build indexes when the program starts
     doctorIdx.rebuild("Doctors.bin", 95, 15);
     appointmentIdx.rebuild("Appointments.dat", 60, 15);
 
-    // Build Secondary Index
-    // Doctor_ID starts at offset 45
-    // Appointment_ID starts at offset 0
-    AppointmentDoctorIndex.rebuild(
-        "Appointments.dat",
-        60,
-        45,
-        15,
-        0,
-        15
-    );
+    AppointmentDoctorIndex.rebuild("Appointments.dat", 60, 45, 15, 0, 15);
+    DoctorNameIndex.rebuild("Doctors.bin", 95, 15, 30, 0, 15);
 
     Doctor d;
     Appointments Ap;
@@ -78,13 +67,12 @@ int main()
         cout << "Enter your choice: ";
         cin >> choice;
 
-        // Remove the remaining newline before using getline
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         switch (choice) {
 
         case 6:
-            d.addDoctor(file, doctorIdx);
+            d.addDoctor(file, doctorIdx, DoctorNameIndex);
             break;
 
         case 7:
@@ -97,11 +85,11 @@ int main()
             break;
 
         case 8:
-            d.updateDoctorName(file, doctorIdx);
+            d.updateDoctorName(file, doctorIdx, DoctorNameIndex);
             break;
 
         case 9:
-            d.updateDoctorId(file, doctorIdx);
+            d.updateDoctorId(file, doctorIdx, DoctorNameIndex);
             break;
 
         case 10:
@@ -120,11 +108,11 @@ int main()
             break;
 
         case 12:
-            d.deleteDoctor(file, doctorIdx);
+            d.deleteDoctor(file, doctorIdx, DoctorNameIndex);
             break;
 
         case 13:
-            // Add your Doctor print function here
+            d.printDoctorInfo(file, doctorIdx);
             break;
 
         case 14:
