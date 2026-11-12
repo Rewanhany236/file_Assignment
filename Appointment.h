@@ -1,10 +1,11 @@
+
 #ifndef APPOINTMENT_H
 #define APPOINTMENT_H
 
 #include <iostream>
 #include <fstream>
 #include "PrimaryIndex.h"
-
+#include "SecondaryIndex.h"
 using namespace std;
 
 const char delete_flag = '*';
@@ -19,12 +20,14 @@ public:
     void addAppointment(
         fstream& file,
         PrimaryIndex& doctorIndex,
-        PrimaryIndex& appointmentIndex
+        PrimaryIndex& appointmentIndex,
+        SecondaryIndex& AppointmentDoctorIndex
     );
 
     bool delete_Appointment(
         fstream& file,
-        PrimaryIndex& appointmentIndex
+        PrimaryIndex& appointmentIndex,
+        SecondaryIndex& AppointmentDoctorIndex
     );
 
     void updateAppointment_date(
