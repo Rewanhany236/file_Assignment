@@ -4,16 +4,11 @@
 #include "Doctor.h"
 #include "PrimaryIndex.h"
 #include "Appointment.h"
-#include <SecondaryIndex.h>
-
 
 using namespace std;
 
 PrimaryIndex doctorIdx;
 PrimaryIndex appointmentIdx;
-SecondaryIndex docNameIdx("docName_LL.bin");       // Index #4
-SecondaryIndex docSpecIdx("docSpec_LL.bin");       // Index #5
-SecondaryIndex appDocIdIdx("appDocId_LL.bin");     // Index #3
 
 int main()
 {
@@ -41,12 +36,24 @@ int main()
         appointmentFile.open("Appointments.dat", ios::in | ios::out | ios::binary);
     }
 
+    // Create Secondary Index
+    SecondaryIndex AppointmentDoctorIndex("AppointmentDoctorLL.dat");
+
     // Build indexes when the program starts
     doctorIdx.rebuild("Doctors.bin", 95, 15);
     appointmentIdx.rebuild("Appointments.dat", 60, 15);
-    docNameIdx.rebuild("Doctors.bin", 95, 15, 30, 0, 15);
-    docSpecIdx.rebuild("Doctors.bin", 95, 45, 20, 0, 15);
-    appDocIdIdx.rebuild("Appointments.dat", 60, 45, 15, 0, 15);
+
+    // Build Secondary Index
+    // Doctor_ID starts at offset 45
+    // Appointment_ID starts at offset 0
+    AppointmentDoctorIndex.rebuild(
+        "Appointments.dat",
+        60,
+        45,
+        15,
+        0,
+        15
+    );
 
     Doctor d;
     Appointments Ap;
@@ -81,7 +88,12 @@ int main()
             break;
 
         case 7:
-            Ap.addAppointment(file, doctorIdx, appointmentIdx);
+            Ap.addAppointment(
+                appointmentFile,
+                doctorIdx,
+                appointmentIdx,
+                AppointmentDoctorIndex
+            );
             break;
 
         case 8:
@@ -93,11 +105,18 @@ int main()
             break;
 
         case 10:
-            Ap.updateAppointment_date(appointmentFile, appointmentIdx);
+            Ap.updateAppointment_date(
+                appointmentFile,
+                appointmentIdx
+            );
             break;
 
         case 11:
-            Ap.delete_Appointment(appointmentFile, appointmentIdx);
+            Ap.delete_Appointment(
+                appointmentFile,
+                appointmentIdx,
+                AppointmentDoctorIndex
+            );
             break;
 
         case 12:
@@ -109,7 +128,10 @@ int main()
             break;
 
         case 14:
-            Ap.print_Appointment_info(appointmentFile, appointmentIdx);
+            Ap.print_Appointment_info(
+                appointmentFile,
+                appointmentIdx
+            );
             break;
 
         case 15:
